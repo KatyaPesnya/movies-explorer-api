@@ -1,16 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
-const { celebrate, Joi } = require('celebrate');
+const cors = require('cors');
 const { errors } = require('celebrate');
 const crypto = require('crypto'); // экспортируем crypto
-const cors = require('cors');
-const usersRoutes = require('./routes/users');
-const moviesRoutes = require('./routes/movies');
-const { login, register } = require('./controllers/users');
-const auth = require('./middlewares/auth');
-const NotFoundError = require('./errors/not-found-err');
+const router = require('./routes/index');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
 const { PORT = 3000 } = process.env;
@@ -33,9 +29,10 @@ mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
 });
 
 app.use('/', express.json());
-app.use(helmet());
 
 app.use(requestLogger);
+
+app.use(helmet());
 
 app.get('/crash-test', () => {
   setTimeout(() => {
@@ -43,40 +40,12 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-  }),
-}), login);
-app.post('/signup', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8)
-      .pattern(new RegExp('^[A-Za-z0-9]{8,30}$')),
-    name: Joi.string().min(2).max(30),
-  }),
-}), register);
-
-app.use(auth);
-
-app.use('/', usersRoutes);
-app.use('/', moviesRoutes);
-
-app.all('*', () => {
-  throw new NotFoundError('Запрашиваемый ресурс не найден');
-});
+app.use('/', router);
 
 app.use(errorLogger);
 
 app.use(errors());
 
-app.use((err, req, res, next) => {
-  console.log(err, err.message, err.name);
-  const statusCode = err.statusCode || 500;
-  const message = statusCode === 500 ? 'На сервере произошла ошибка' : err.message;
-  res.status(statusCode).send({ message });
-  next();
-});
+app.use(errorHandler);
 
 app.listen(PORT);

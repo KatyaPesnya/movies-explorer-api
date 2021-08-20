@@ -4,8 +4,8 @@ const NotFoundError = require('../errors/not-found-err');
 const NotAuthError = require('../errors/not-auth-err');
 
 const getMovies = (req, res, next) => {
-  const owner = req.user_id;
-  Movie.find({ owner })
+  // const owner = req.user_id;
+  Movie.find()
     .then((movies) => {
       res.status(200).send(movies);
     })
