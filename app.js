@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
@@ -7,6 +8,7 @@ const crypto = require('crypto'); // экспортируем crypto
 const router = require('./routes/index');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
+const limiter = require('./middlewares/limiter');
 
 const app = express();
 const { PORT = 3000 } = process.env;
@@ -19,7 +21,6 @@ const randomString = crypto
   .toString('hex'); // приведём её к строке
 
 console.log(randomString);
-require('dotenv').config();
 
 mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
   useNewUrlParser: true,
@@ -33,6 +34,8 @@ app.use('/', express.json());
 app.use(requestLogger);
 
 app.use(helmet());
+
+app.use(limiter);
 
 app.get('/crash-test', () => {
   setTimeout(() => {
