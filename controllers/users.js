@@ -18,11 +18,11 @@ const getProfile = (req, res, next) => {
 
 const updateProfile = (req, res, next) => {
   const id = req.user._id;
-  const { name, about } = req.body;
+  const { name, email } = req.body;
 
   User.findOneAndUpdate(
     { _id: id },
-    { name, about },
+    { name, email },
     { runValidators: true, new: true },
   )
     .then((user) => {
