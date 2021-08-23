@@ -4,26 +4,19 @@ const mongoose = require('mongoose');
 const helmet = require('helmet');
 const cors = require('cors');
 const { errors } = require('celebrate');
-const crypto = require('crypto'); // экспортируем crypto
 const router = require('./routes/index');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
 const limiter = require('./middlewares/limiter');
+const { PORT_NUMBER, DB_ADDRESS } = require('./utils/constants');
 
 const app = express();
-const { PORT = 3000 } = process.env;
-const connection = (process.env.DB_CONNECTION_STRING);
+const { PORT = PORT_NUMBER } = process.env;
 
 app.use(cors());
 app.options('*', cors());
 
-const randomString = crypto
-  .randomBytes(16) // сгенерируем случайную последовательность 16 байт (128 бит)
-  .toString('hex'); // приведём её к строке
-
-console.log(randomString);
-
-mongoose.connect(connection, {
+mongoose.connect(DB_ADDRESS, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
