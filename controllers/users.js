@@ -29,7 +29,12 @@ const updateProfile = (req, res, next) => {
     .then((user) => {
       res.status(200).send(user);
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'MongoError' && err.code === 11000) {
+        next(new ConflictError('Нельзя обновлять данные другого пользователя.'));
+      }
+      next(err);
+    });
 };
 
 const register = (req, res, next) => {
