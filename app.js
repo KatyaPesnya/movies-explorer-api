@@ -12,6 +12,7 @@ const limiter = require('./middlewares/limiter');
 
 const app = express();
 const { PORT = 3000 } = process.env;
+const connection = (process.env.DB_CONNECTION_STRING);
 
 app.use(cors());
 app.options('*', cors());
@@ -22,7 +23,7 @@ const randomString = crypto
 
 console.log(randomString);
 
-mongoose.connect('mongodb://localhost:27017/moviesdb', {
+mongoose.connect(connection, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,

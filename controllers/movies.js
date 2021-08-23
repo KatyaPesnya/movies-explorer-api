@@ -53,7 +53,7 @@ const deleteMovie = (req, res, next) => {
   Movie.findById(movieId)
     .orFail(() => next(new NotFoundError('Карточка с указанным id не найдена')))
     .then((movie) => {
-      if (owner.toString() !== owner) {
+      if (owner.toString() === movie.owner.toString()) {
         return movie.remove()
           .then(() => res.status(200).send({ message: 'Фильм удалён' }));
       }
@@ -61,7 +61,7 @@ const deleteMovie = (req, res, next) => {
     })
     .catch((err) => {
       if (err.kind === 'ObjectId') {
-        next(new BadReqError('Невадилный id'));
+        next(new BadReqError('Невалидный id'));
       }
       next(err);
     });
