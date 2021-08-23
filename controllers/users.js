@@ -4,6 +4,7 @@ const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
 const ConflictError = require('../errors/conflict-err');
 const NotAuthError = require('../errors/not-auth-err');
+const BadReqError = require('../errors/bad-req-err');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -33,10 +34,14 @@ const updateProfile = (req, res, next) => {
 
 const register = (req, res, next) => {
   const { email } = req.body;
+
   User.findOne({ email })
     .then((user) => {
       if (user) {
         next(new ConflictError('Такой пользователь уже зарегистрирован'));
+        return;
+      } if (!user) {
+        next(new BadReqError('Не заполнены обязательные поля.'));
       }
     });
   bcrypt
