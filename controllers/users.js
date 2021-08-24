@@ -31,24 +31,13 @@ const updateProfile = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'MongoError' && err.code === 11000) {
-        next(new ConflictError('Нельзя обновлять данные другого пользователя.'));
+        next(new ConflictError(`Пользователь с почтой ${email} уже существует!`));
       }
       next(err);
     });
 };
 
 const register = (req, res, next) => {
-  const { email } = req.body;
-
-  User.findOne({ email })
-    .then((user) => {
-      if (user) {
-        next(new ConflictError('Такой пользователь уже зарегистрирован'));
-        return;
-      } if (!user) {
-        next(new BadReqError('Не заполнены обязательные поля.'));
-      }
-    });
   bcrypt
     .hash(req.body.password, 10)
     .then((hash) => User.create({
@@ -64,7 +53,14 @@ const register = (req, res, next) => {
 
       });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadReqError('Не заполнены обязательные поля.'));
+      }
+      if (err.code === 11000) {
+        next(new ConflictError('Такой пользователь уже зарегистрирован.'));
+      }
+    });
 };
 
 const login = (req, res, next) => {
