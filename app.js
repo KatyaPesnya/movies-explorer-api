@@ -8,10 +8,9 @@ const router = require('./routes/index');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
 const limiter = require('./middlewares/limiter');
-const { PORT_NUMBER, DB_ADDRESS } = require('./utils/constants');
+const { PORT, DB_ADDRESS } = require('./utils/config');
 
 const app = express();
-const { PORT = PORT_NUMBER } = process.env;
 
 app.use(cors());
 app.options('*', cors());
