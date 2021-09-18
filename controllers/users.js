@@ -60,6 +60,7 @@ const register = (req, res, next) => {
       if (err.code === 11000) {
         next(new ConflictError('Такой пользователь уже зарегистрирован.'));
       }
+      next(err);
     });
 };
 
