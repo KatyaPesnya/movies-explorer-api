@@ -11,7 +11,7 @@ router.post('/movies', celebrate({
     director: Joi.string().required().min(1).max(100),
     duration: Joi.number().required(),
     year: Joi.string().required().min(1).max(4),
-    description: Joi.string().required().min(1).max(1000),
+    description: Joi.string().required(),
     image: Joi.string().required().custom((value, helpers) => {
       if (validator.isURL(value)) {
         return value;
